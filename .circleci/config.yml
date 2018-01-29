@@ -1,0 +1,40 @@
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build
+      - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: cibuilds/snapcraft:stable
+    steps:
+      - checkout
+      - run:
+          name: "Build Snap"
+          command: snapcraft
+      - persist_to_workspace:
+          root: .
+          paths:
+            - "*.snap"
+
+  publish:
+    docker:
+      - image: cibuilds/snapcraft:stable
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Publish to Store"
+          command: |
+            mkdir .snapcraft
+            echo $SNAPCRAFT_LOGIN_FILE | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
+            snapcraft push *.snap

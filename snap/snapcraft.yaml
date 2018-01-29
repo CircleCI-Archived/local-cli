@@ -1,0 +1,28 @@
+name: circleci-local-cli
+version: "dev"
+version-script: ./circleci.sh --version
+summary: "The CircleCI Local CLI"
+description: |
+  The CircleCI Local CLI allows you to run builds on your local machine as if they were running within CircleCI. This allows quick interation over small changes and easier debugging of issues. The Local CLI can also validate your CircleCI configuration file.
+grade: stable
+confinement: strict
+#architectures: [ "all" ]
+
+# Next two lines useful only if we use original CLI script
+#environment:
+#  MANUAL_CLI_UPDATE: "off"
+
+parts:
+  circleci:
+    plugin: nil
+    #prepare: wget https://circle-downloads.s3.amazonaws.com/releases/build_agent_wrapper/circleci
+    install: |
+      #cp circleci $SNAPCRAFT_PART_INSTALL
+      cp circleci.sh $SNAPCRAFT_PART_INSTALL/circleci
+      chmod +x $SNAPCRAFT_PART_INSTALL/circleci
+    stage-packages: [docker.io]
+
+apps:
+  circleci:
+    command: circleci
+    plugs: [docker]
