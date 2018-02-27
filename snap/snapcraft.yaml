@@ -1,4 +1,4 @@
-name: circleci-local-cli
+name: circleci
 version: "dev"
 version-script: ./circleci.sh --version
 summary: "The CircleCI Local CLI"
