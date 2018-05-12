@@ -3,7 +3,13 @@ workflows:
   main:
     jobs:
       - build
-      - publish:
+      - publish-snap:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+      - publish-github-releases:
           requires:
             - build
           filters:
@@ -21,12 +27,29 @@ jobs:
       - run:
           name: "Build Snap"
           command: snapcraft
+      - run:
+          name: Generate tarball
+          command: |
+            VERSION="v$(bash circleci.sh --version)"
+            echo "Creating version ${VERSION}"
+            tar -czf circleci_${VERSION}.tar.gz circleci.sh
+      - run:
+          name: Copy artifacts to folder
+          command: |
+            # store_artifacts doesnt seem to support expansion/interpolation
+            mkdir artifacts
+            cp circleci_v*.tar.gz artifacts/
+            cp *.snap artifacts
       - persist_to_workspace:
           root: .
           paths:
             - "*.snap"
+            - "*.tar.gz"
+      - store_artifacts:
+          path: artifacts
 
-  publish:
+
+  publish-snap:
     docker:
       - image: cibuilds/snapcraft:stable
     steps:
@@ -38,3 +61,19 @@ jobs:
             mkdir .snapcraft
             echo $SNAPCRAFT_LOGIN_FILE | base64 --decode --ignore-garbage > .snapcraft/snapcraft.cfg
             snapcraft push *.snap --release stable
+
+
+
+  publish-github-releases:
+    docker:
+      - image: circleci/golang:1.8
+    steps:
+      - attach_workspace:
+          at: .
+      - run:
+          name: Publish release on github (for homebrew)
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=$(ls *.tar.gz | sed -e 's/circleci_\([a-z0-9.-]*\)\.tar\.gz/\1/')
+            echo "Pushing tarball and snap for version ${VERSION} to github releases"
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./
