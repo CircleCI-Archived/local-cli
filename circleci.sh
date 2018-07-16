@@ -134,7 +134,7 @@ if is_update_available; then
   echo "INFO: There's a newer version of the CircleCI build agent available. Run 'circleci update' to update."
 fi
 
-docker run -it --rm \
+docker run -t --rm \
        -e DOCKER_API_VERSION=${DOCKER_API_VERSION:-1.23} \
        -v /var/run/docker.sock:/var/run/docker.sock \
        -v "$(pwd)":"$(pwd)" \
