@@ -137,8 +137,8 @@ fi
 docker run -it --rm \
        -e DOCKER_API_VERSION=${DOCKER_API_VERSION:-1.23} \
        -v /var/run/docker.sock:/var/run/docker.sock \
-       -v $(pwd):$(pwd) \
+       -v "$(pwd)":"$(pwd)" \
        -v ~/.circleci/:/root/.circleci \
-       --workdir $(pwd) \
+       --workdir "$(pwd)" \
        $picard_image \
        circleci "$@"
