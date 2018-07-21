@@ -13,7 +13,7 @@ LATEST_DIGEST_FILE="$CIRCLECI_DIR/latest_picard_digest"
 
 UNKNOWN_DIGEST=""
 
-CLI_VERSION="0.0.4705-deba4df"
+CLI_VERSION="0.1.0"
 
 # Pull `latest` tag from docker repo and write digest into the file
 pull_latest_image() {
