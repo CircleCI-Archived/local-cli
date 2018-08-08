@@ -3,18 +3,18 @@ workflows:
   main:
     jobs:
       - build
-      - publish-snap:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
-      - publish-github-releases:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+      #- publish-snap:
+      #    requires:
+      #      - build
+      #    filters:
+      #      branches:
+      #        only: master
+      #- publish-github-releases:
+      #    requires:
+      #      - build
+      #    filters:
+      #      branches:
+      #        only: master
 
 
 version: 2
